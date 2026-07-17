@@ -1,0 +1,21 @@
+# Folder conventions
+
+- `app/` — routes only (App Router). Current routes: `/` (home), `/categories`, `/category/[slug]`, `/tools/[slug]`, `/search`. Plus `app/api/recommend/route.ts` — the (server-only) chat assistant endpoint.
+- `components/ui/` — shadcn-generated primitives. Don't hand-edit beyond what the CLI produces; re-run `shadcn add` to update.
+- `components/layout/` — site chrome: header (`site-header.tsx`), footer (`site-footer.tsx`), logo.
+- `components/home/` — one file per home page section (hero, featured-tools, browse-categories, how-it-works, social-proof, cta-band). `app/page.tsx` just composes them.
+- `components/categories/` — interactive pieces for the `/categories` page (search/filter explorer).
+- `components/search/` — interactive pieces for the `/search` page (search + filter explorer).
+- `components/shared/` — cards and other pieces reused across multiple routes (`tool-card.tsx`, `category-card.tsx`).
+- `components/motion/` — reusable Framer Motion wrappers (`reveal.tsx`, `animated-background.tsx`).
+- `components/chat/` — the AI recommendation chat widget (`chat-widget.tsx`, `chat-message-bubble.tsx`, `recommendation-card.tsx`). See `@rules/ai-chat-assistant.md`.
+- `components/providers/` — client-only context providers mounted in `app/layout.tsx` (currently `redux-provider.tsx`).
+- `lib/types.ts` — shared `Category` / `Tool` / `PricingType` types.
+- `lib/data/` — **Supabase-backed** data access (`categories.ts`, `tools.ts`), all `async`: `getCategories`, `getCategoryBySlug`, `getTools`, `getToolBySlug`, `getToolsByCategory`, `getFeaturedTools`, `searchTools`. `lib/data/index.ts` re-exports everything plus cross-cutting helpers like `getCategoriesWithCounts`. Every caller across `app/` is a Server Component and must `await` these. See `@rules/data-layer.md`.
+- `lib/supabase/client.ts` — lazy Supabase client (anon key, public read-only).
+- `lib/icon-map.ts` — maps a category's `icon` string (a lucide icon name) to the actual component.
+- `lib/pricing.ts` — label/className maps for the four `PricingType` values.
+- `lib/ai/` — server-only Gemini integration: `gemini.ts` (raw API wrapper, the only file that knows Gemini's request/response shape), `recommend.ts` (builds the dataset-grounded prompt and validates the model's output against real tool slugs — fetches fresh from `lib/data` on every call), `types.ts` (`ChatMessage`, `ChatEntry`, `ToolRecommendation`, `RecommendResponse`).
+- `lib/api/axios.ts` — shared axios instance for frontend → our-own-API calls.
+- `lib/store/` — Redux Toolkit: `store.ts`, `hooks.ts` (typed `useAppDispatch`/`useAppSelector`), `chat-slice.ts` (chat message state + the `sendChatMessage` thunk).
+- `supabase/` — `schema.sql` (tables + RLS policies) and `seed.sql` (the original mock dataset as INSERT statements) to run once in the Supabase SQL Editor. Not application code; not imported anywhere.
